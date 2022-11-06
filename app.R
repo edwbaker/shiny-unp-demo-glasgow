@@ -46,7 +46,7 @@ server <- function(input, output) {
       tt <- tt[tt$Common.Name==input$species,]
       dielPlot(input$date, 55.868581, -4.290506)
       if (nrow(tt) > 0) {
-        dielHistogram(tt$Start, by="15minute", col="blue")
+        dielHistogram(tt$Start, by="15minute", col="blue", presence.only=T)
       }
     })
 }
