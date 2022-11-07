@@ -5,7 +5,7 @@ library(sonicscrewdriver)
 t <- read_feather("glasgow.feather")
 t <- t[which(t$Confidence > 0.8),]
 
-species <- unique(t$Common.Name)
+species <- c("All", unique(t$Common.Name))
 
 ui <- fluidPage(
 
@@ -26,7 +26,7 @@ ui <- fluidPage(
           selectInput("species",
                       "Species:",
                       species,
-                      selected = "Eurasian Wren",
+                      selected = "All",
                       multiple = FALSE,
                       selectize = TRUE,
                       width = NULL,
@@ -43,7 +43,9 @@ ui <- fluidPage(
 server <- function(input, output) {
     output$dielPlot <- renderPlot({
       tt <- t[which(t$Start < as.POSIXct(input$date)+ 86400 & t$Start > as.POSIXct(input$date)),]
-      tt <- tt[tt$Common.Name==input$species,]
+      if (input$species != "All") {
+        tt <- tt[tt$Common.Name==input$species,]
+      }
       dielPlot(input$date, 55.868581, -4.290506)
       if (nrow(tt) > 0) {
         dielHistogram(tt$Start, by="15minute", col="blue", presence.only=T)
