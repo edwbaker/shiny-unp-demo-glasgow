@@ -28,7 +28,7 @@ sites <- c(
 )
 
 ui <- fluidPage(
-    titlePanel("UNP Bird Demo (Glasgow August-September 2022)"),
+    titlePanel("UNP AudioMoth Demo"),
 
     sidebarLayout(
         sidebarPanel(
