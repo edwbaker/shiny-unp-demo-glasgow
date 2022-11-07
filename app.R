@@ -2,8 +2,12 @@ library(shiny)
 library(feather)
 library(sonicscrewdriver)
 
+#Read BirdNet data
 b <- read_feather("glasgow.feather")
 b <- b[which(b$Confidence > 0.8),]
+
+#Read temperature data
+t <- read_feather("glasgowT.feather")
 
 species <- c("All", unique(b$Common.Name))
 
@@ -35,7 +39,8 @@ ui <- fluidPage(
         ),
 
         mainPanel(
-           plotOutput("dielPlot")
+           plotOutput("dielPlot"),
+           plotOutput("temperature")
         )
     )
 )
@@ -50,6 +55,16 @@ server <- function(input, output) {
       if (nrow(bb) > 0) {
         dielHistogram(bb$Start, by="15minute", col="blue", presence.only=T)
       }
+    })
+    output$temperature <- renderPlot({
+      tt <- t[which(t$datetime < as.POSIXct(input$date)+ 86400 & t$datetime > as.POSIXct(input$date)),]
+      plot(
+        tt$datetime,
+        tt$temperature,
+        type="l",
+        xlab="Time",
+        ylab="Temperature"
+      )
     })
 }
 
