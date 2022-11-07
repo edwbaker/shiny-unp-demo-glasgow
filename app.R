@@ -2,10 +2,10 @@ library(shiny)
 library(feather)
 library(sonicscrewdriver)
 
-t <- read_feather("glasgow.feather")
-t <- t[which(t$Confidence > 0.8),]
+b <- read_feather("glasgow.feather")
+b <- b[which(b$Confidence > 0.8),]
 
-species <- c("All", unique(t$Common.Name))
+species <- c("All", unique(b$Common.Name))
 
 ui <- fluidPage(
 
@@ -42,13 +42,13 @@ ui <- fluidPage(
 
 server <- function(input, output) {
     output$dielPlot <- renderPlot({
-      tt <- t[which(t$Start < as.POSIXct(input$date)+ 86400 & t$Start > as.POSIXct(input$date)),]
+      bb <- b[which(b$Start < as.POSIXct(input$date)+ 86400 & b$Start > as.POSIXct(input$date)),]
       if (input$species != "All") {
-        tt <- tt[tt$Common.Name==input$species,]
+        bb <- bb[bb$Common.Name==input$species,]
       }
       dielPlot(input$date, 55.868581, -4.290506)
-      if (nrow(tt) > 0) {
-        dielHistogram(tt$Start, by="15minute", col="blue", presence.only=T)
+      if (nrow(bb) > 0) {
+        dielHistogram(bb$Start, by="15minute", col="blue", presence.only=T)
       }
     })
 }
