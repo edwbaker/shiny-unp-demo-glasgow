@@ -22,7 +22,7 @@ species <- c(
 )
 
 sites <- c(
-  "Glasgow",
+  "Glasgow1",
   "Newcastle1",
   "Newcastle2"
 )
