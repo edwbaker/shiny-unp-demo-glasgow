@@ -81,7 +81,7 @@ server <- function(input, output, session) {
     # Control the value, min, max, and step.
     # Step size is 2 when input value is even; 1 when value is odd.
     updateSliderInput(session, "date",
-                      min = min(t()$datetime), max = max(t()$datetime))
+                      min = min(as.Date(t()$datetime)), max = max(as.Date(t()$datetime)))
   })
 
 
@@ -108,7 +108,14 @@ server <- function(input, output, session) {
           tt$temperature,
           type="l",
           xlab="Time",
-          ylab="Temperature (°C)"
+          ylab="Temperature (°C)",
+          xlim=c(as.POSIXct(input$date), as.POSIXct(input$date)+ 86400),
+          xaxt="n"
+        )
+        axis(
+          1,
+          at = as.POSIXct(input$date) + seq(0, 86400, by = 60*60*3),
+          labels = c("0000", "0300","0600", "0900", "1200", "1500", "1800", "2100", "2400")
         )
       }
     })
