@@ -2,14 +2,30 @@ library(shiny)
 library(feather)
 library(sonicscrewdriver)
 
-#Read BirdNet data
-b <- read_feather("glasgow.feather")
-b <- b[which(b$Confidence > 0.8),]
+species <- c(
+  "All",
+  "Long-tailed Tit",
+  "Eurasian Magpie",
+  "Eurasian Wren",
+  "Eurasian Jackdaw",
+  "Dunnock",
+  "Eurasian Blue Tit",
+  "European Robin",
+  "Common Chiffchaff",
+  "Coal Tit",
+  "Common Wood-Pigeon",
+  "Eurasian Treecreeper",
+  "Gray Wagtail",
+  "Great Tit",
+  "Goldcrest",
+  "Eurasian Blackbird"
+)
 
-#Read temperature data
-t <- read_feather("glasgowT.feather")
-
-species <- c("All", unique(b$Common.Name))
+sites <- c(
+  "Glasgow",
+  "Newcastle1",
+  "Newcastle2"
+)
 
 ui <- fluidPage(
     titlePanel("UNP Bird Demo (Glasgow August-September 2022)"),
@@ -19,6 +35,9 @@ ui <- fluidPage(
           tags$h4("Filter data"),
           tags$p("Dragging the date slider changes the day plotted, and the play button automatically advances through the days.
                  The Bird species drop-down allows data for a single species to be displayed."),
+          selectInput("site",
+                      "Site:",
+                      sites),
           sliderInput("date",
                       "Date:",
                       min = as.Date("2022-08-22","%Y-%m-%d"),
@@ -53,26 +72,45 @@ ui <- fluidPage(
     )
 )
 
-server <- function(input, output) {
+server <- function(input, output, session) {
+  #Read temperature data
+  t <- reactive(read_feather(paste0(input$site,"T.feather")))
+
+  observe({
+    val <- input$site
+    # Control the value, min, max, and step.
+    # Step size is 2 when input value is even; 1 when value is odd.
+    updateSliderInput(session, "date",
+                      min = min(t()$datetime), max = max(t()$datetime))
+  })
+
+
+
+
     output$dielPlot <- renderPlot({
-      bb <- b[which(b$Start < as.POSIXct(input$date)+ 86400 & b$Start > as.POSIXct(input$date)),]
+      #Read BirdNet data
+      b <- read_feather(paste0(input$site,".feather"))
+      bb <- b[which(b$Confidence > 0.8),]
+      bb <- bb[which(bb$Start < as.POSIXct(input$date)+ 86400 & bb$Start > as.POSIXct(input$date)),]
       if (input$species != "All") {
         bb <- bb[bb$Common.Name==input$species,]
       }
-      dielPlot(input$date, 55.868581, -4.290506,legend=T)
+      dielPlot(input$date, 55.868581, -4.290506, legend=T)
       if (nrow(bb) > 0) {
         dielHistogram(bb$Start, by="15minute", col="blue", presence.only=T)
       }
     })
     output$temperature <- renderPlot({
-      tt <- t[which(t$datetime < as.POSIXct(input$date)+ 86400 & t$datetime > as.POSIXct(input$date)),]
-      plot(
-        tt$datetime,
-        tt$temperature,
-        type="l",
-        xlab="Time",
-        ylab="Temperature (°C)"
-      )
+      tt <- t()[which(t()$datetime < as.POSIXct(input$date)+ 86400 & t()$datetime > as.POSIXct(input$date)),]
+      if (nrow(tt) > 0) {
+        plot(
+          tt$datetime,
+          tt$temperature,
+          type="l",
+          xlab="Time",
+          ylab="Temperature (°C)"
+        )
+      }
     })
 }
 
