@@ -17,8 +17,8 @@ ui <- fluidPage(
     sidebarLayout(
         sidebarPanel(
           tags$h4("Filter data"),
-          tags$p("Dragging the date slider changes the day plotted. The play button automatically advances through days.
-                 The Bird species drop down allows data for a single species to be displayed."),
+          tags$p("Dragging the date slider changes the day plotted, and the play button automatically advances through the days.
+                 The Bird species drop-down allows data for a single species to be displayed."),
           sliderInput("date",
                       "Date:",
                       min = as.Date("2022-08-22","%Y-%m-%d"),
@@ -41,9 +41,9 @@ ui <- fluidPage(
 
         mainPanel(
           tags$h4("Automated bird identifications"),
-          tags$p("Bird vocalisations are identified using the BirdNet Analyser. The visualisation shows
-                 presence/absence of bird vocalisation on a 15 minute basis (blue bars). The base plot shows periods of night,
-                 twilight, sunrise/sunset, and the height of the sun above the horizon."),
+          tags$p("Bird vocalisations have been identified using the BirdNet Analyser. The visualisation shows
+                 the presence/absence of bird vocalisation on a 15-minute basis (blue bars). The base plot
+                 shows periods of night, twilight, sunrise/sunset, and the sun's height above the horizon."),
           plotOutput("dielPlot"),
           tags$h4("Temperature"),
           tags$p("Audiomoth devices have an inbuilt temperature sensor that records the ambient temperature
